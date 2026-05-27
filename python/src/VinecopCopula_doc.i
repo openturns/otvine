@@ -1,15 +1,23 @@
 %feature("docstring") OTVINE::VinecopCopula
-"Vine copula.
+R"RAW(Vine copula backed by vinecopulib.
+
+Built from an R-vine matrix and a collection of pair-copulas, or from fitted data.
+
+Parameters
+----------
+matrix : :class:`~openturns.Matrix`
+    R-vine matrix (1-based indices, lower-triangular).
+copulas : sequence of :class:`~openturns.Distribution`
+    Pair-copulas in tree-by-tree order.
 
 Examples
 --------
->>> import otvine
 >>> import openturns as ot
->>> sample = ot.ClaytonCopula().getSample(100)
->>> factory = otvine.VineCopulaFactory()
->>> distribution = factory.build(sample)
-
-Notes
------
-https://www.math.cit.tum.de/math/forschung/gruppen/statistics/vine-copula-models/
-"
+>>> import otvine
+>>> # Build from matrix and copulas
+>>> vine = otvine.VineCopula(3)
+>>> vine.addArc([0, 1], ot.FrankCopula(3.0))
+>>> vine.addArc([1, 2], ot.GumbelCopula(2.0))
+>>> vine.addArc([0, 2], ot.ClaytonCopula(1.5))
+>>> vc = otvine.VinecopCopula(vine.getMatrix(), vine.getCopulaCollection())
+)RAW"

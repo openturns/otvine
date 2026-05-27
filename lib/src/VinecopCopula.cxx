@@ -20,6 +20,8 @@
  */
 #include "otvine/VinecopCopula.hxx"
 #include <openturns/PersistentObjectFactory.hxx>
+#include <openturns/SpecFunc.hxx>
+#include <openturns/Distribution.hxx>
 
 #include <vinecopulib.hpp>
 
@@ -48,6 +50,103 @@ VinecopCopula::VinecopCopula(const Pointer<vinecopulib::Vinecop> & p_vinecop)
   isCopula_ = true;
   setName("VinecopCopula");
   setDimension(p_vinecop->get_dim());
+}
+
+namespace
+{
+
+vinecopulib::Bicop convertToBicop(const Distribution & copula)
+{
+  const String name = copula.getImplementation()->getClassName();
+  const Point params = copula.getParameter();
+
+  if (name == "FrankCopula")
+  {
+    Eigen::MatrixXd bicopParams(1, 1);
+    bicopParams(0, 0) = params[0];
+    return vinecopulib::Bicop(vinecopulib::BicopFamily::frank, 0, bicopParams);
+  }
+  if (name == "GumbelCopula")
+  {
+    Eigen::MatrixXd bicopParams(1, 1);
+    bicopParams(0, 0) = params[0];
+    return vinecopulib::Bicop(vinecopulib::BicopFamily::gumbel, 0, bicopParams);
+  }
+  if (name == "ClaytonCopula")
+  {
+    Eigen::MatrixXd bicopParams(1, 1);
+    bicopParams(0, 0) = params[0];
+    return vinecopulib::Bicop(vinecopulib::BicopFamily::clayton, 0, bicopParams);
+  }
+  if (name == "NormalCopula")
+  {
+    Eigen::MatrixXd bicopParams(1, 1);
+    bicopParams(0, 0) = params[0];
+    return vinecopulib::Bicop(vinecopulib::BicopFamily::gaussian, 0, bicopParams);
+  }
+  if (name == "StudentCopula")
+  {
+    Eigen::MatrixXd bicopParams(2, 1);
+    bicopParams(0, 0) = params[1];
+    bicopParams(1, 0) = params[0];
+    return vinecopulib::Bicop(vinecopulib::BicopFamily::student, 0, bicopParams);
+  }
+  if (name == "IndependentCopula")
+  {
+    return vinecopulib::Bicop(vinecopulib::BicopFamily::indep, 0);
+  }
+  if (name == "TawnCopula")
+  {
+    Eigen::MatrixXd bicopParams(3, 1);
+    bicopParams(0, 0) = params[1];
+    bicopParams(1, 0) = params[2];
+    bicopParams(2, 0) = params[0];
+    return vinecopulib::Bicop(vinecopulib::BicopFamily::tawn, 0, bicopParams);
+  }
+  if (name == "JoeCopula")
+  {
+    Eigen::MatrixXd bicopParams(1, 1);
+    bicopParams(0, 0) = params[0];
+    return vinecopulib::Bicop(vinecopulib::BicopFamily::joe, 0, bicopParams);
+  }
+
+  throw InvalidArgumentException(HERE) << "Unsupported copula type: " << name;
+}
+
+} // anonymous namespace
+
+VinecopCopula::VinecopCopula(const Matrix & matrix,
+                               const DistributionCollection & copulaCollection)
+  : DistributionImplementation()
+{
+  isCopula_ = true;
+  setName("VinecopCopula");
+
+  const UnsignedInteger d = matrix.getNbRows();
+  setDimension(d);
+
+  // Convert OT matrix to Eigen matrix (size_t, d x d)
+  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(d, d);
+  for (UnsignedInteger i = 0; i < d; ++i)
+    for (UnsignedInteger j = 0; j < d; ++j)
+      mat(i, j) = static_cast<size_t>(matrix(i, j));
+
+  // Allocate pair-copula store
+  std::vector<std::vector<vinecopulib::Bicop>> pairCopulas =
+      vinecopulib::Vinecop::make_pair_copula_store(d);
+
+  // Fill pair-copulas in tree-by-tree order
+  UnsignedInteger idx = 0;
+  for (size_t tree = 0; tree < d - 1; ++tree)
+  {
+    for (size_t edge = 0; edge < d - 1 - tree; ++edge)
+    {
+      pairCopulas[tree][edge] = convertToBicop(copulaCollection[idx]);
+      ++idx;
+    }
+  }
+
+  p_vinecop_ = new vinecopulib::Vinecop(mat, pairCopulas);
 }
 
 /* Virtual constructor method */

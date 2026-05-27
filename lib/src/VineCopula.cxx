@@ -22,6 +22,7 @@
 #include <openturns/PersistentObjectFactory.hxx>
 #include <openturns/SpecFunc.hxx>
 #include <openturns/RandomGenerator.hxx>
+#include <openturns/SobolSequence.hxx>
 
 #include <map>
 #include <set>
@@ -89,7 +90,7 @@ Matrix VineCopula::getMatrix() const
   return matrix_;
 }
 
-PersistentCollection<Distribution> VineCopula::getCopulaCollection() const
+DistributionCollection VineCopula::getCopulaCollection() const
 {
   return copulaCollection_;
 }
@@ -219,31 +220,52 @@ Scalar VineCopula::computePDF(const Point & point) const
   const UnsignedInteger d = getDimension();
   const UnsignedInteger nbTrees = d - 1;
 
-  // v[tree][edge] matrix of pseudo-observations
-  // v[0][i] = u_i
-  // v[t+1][i] = hfunc1(v[t][i], v[t][i+1]) from C_{i, i+t+1}
-  std::vector<std::vector<Scalar>> v(d);
-  for (UnsignedInteger t = 0; t < d; ++t)
-    v[t].resize(d - t);
+  // L[t][e] = F(u_e | u_{e+1}, ..., u_{e+t})  left pseudo-observations
+  // R[t][e] = F(u_{e+t+1} | u_{e+1}, ..., u_{e+t})  right pseudo-observations
+  std::vector<std::vector<Scalar>> L(nbTrees);
+  std::vector<std::vector<Scalar>> R(nbTrees);
+  for (UnsignedInteger t = 0; t < nbTrees; ++t)
+  {
+    L[t].resize(d - 1 - t);
+    R[t].resize(d - 1 - t);
+  }
 
-  for (UnsignedInteger i = 0; i < d; ++i)
-    v[0][i] = point[i];
+  // Tree 0: original values
+  for (UnsignedInteger e = 0; e < d - 1; ++e)
+  {
+    L[0][e] = point[e];
+    R[0][e] = point[e + 1];
+  }
 
   Scalar pdf = 1.0;
 
-  for (UnsignedInteger t = 0; t < nbTrees; ++t)
+  // Density contribution for tree 0
+  for (UnsignedInteger e = 0; e < d - 1; ++e)
+    pdf *= copulaCollection_[e].computePDF(Point({L[0][e], R[0][e]}));
+
+  // Higher trees
+  for (UnsignedInteger t = 1; t < nbTrees; ++t)
   {
     const UnsignedInteger nbEdges = d - 1 - t;
-    for (UnsignedInteger i = 0; i < nbEdges; ++i)
+    for (UnsignedInteger e = 0; e < nbEdges; ++e)
     {
-      const UnsignedInteger idx = arcIndex(t, i, d);
-      const Distribution & copula = copulaCollection_[idx];
+      // Left pseudo: F(u_e | u_{e+1}, ..., u_{e+t})
+      // Uses hfunc1 from copula C_{e, e+t} at tree t-1, edge e
+      {
+        const UnsignedInteger idx = arcIndex(t - 1, e, d);
+        L[t][e] = copulaCollection_[idx].computeConditionalCDF(L[t - 1][e], Point(1, R[t - 1][e]));
+      }
 
-      // Pair-copula density contribution
-      pdf *= copula.computePDF(Point({v[t][i], v[t][i + 1]}));
+      // Right pseudo: F(u_{e+t+1} | u_{e+1}, ..., u_{e+t})
+      // Uses hfunc2 from copula C_{e+1, e+t+1} at tree t-1, edge e+1
+      {
+        const UnsignedInteger idx = arcIndex(t - 1, e + 1, d);
+        R[t][e] = hfunc2(copulaCollection_[idx], R[t - 1][e + 1], L[t - 1][e + 1]);
+      }
 
-      // Update pseudo-observation for next tree
-      v[t + 1][i] = copula.computeConditionalCDF(v[t][i], Point(1, v[t][i + 1]));
+      // Density contribution for this edge
+      const UnsignedInteger idx = arcIndex(t, e, d);
+      pdf *= copulaCollection_[idx].computePDF(Point({L[t][e], R[t][e]}));
     }
   }
 
