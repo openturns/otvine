@@ -57,4 +57,30 @@ print(f"2D PDF={pdf2}")
 assert pdf2 > 0.0
 
 print()
+print("=== Matrix/collection constructor + accessors ===")
+# Build a 3D vine, extract matrix+copulas, construct a new one
+copula_m = otvine.VineCopula(3)
+copula_m.addArc([0, 1], ot.FrankCopula(3.0))
+copula_m.addArc([1, 2], ot.GumbelCopula(2.0))
+copula_m.addArc([0, 2], ot.ClaytonCopula(1.5))
+mat = copula_m.getMatrix()
+copulas = copula_m.getCopulaCollection()
+print(f"Matrix dim={mat.getNbRows()}x{mat.getNbColumns()}")
+print(f"Nb copulas={copulas.getSize()}")
+assert mat.getNbRows() == 3
+assert copulas.getSize() == 3
+
+# Reconstruct from matrix and copulas
+copula_r = otvine.VineCopula(mat, copulas)
+pdf_r = copula_r.computePDF([0.3, 0.5, 0.7])
+print(f"Reconstructed PDF={pdf_r}")
+assert abs(pdf_r - pdf) < 1e-14
+
+# Accessors
+mat2 = copula_r.getMatrix()
+assert mat2.getNbRows() == 3
+copulas2 = copula_r.getCopulaCollection()
+assert len(copulas2) == 3
+
+print()
 print("All tests passed!")
