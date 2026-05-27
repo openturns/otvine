@@ -56,3 +56,14 @@ for rotation in [0, 90, 180, 270]:
     assert "ClaytonCopula" in str(distribution)
     if rotation > 0:
         assert f"rotation={rotation}" in str(distribution)
+
+# tawn
+copula = otvine.TawnCopula(2.0, 0.6, 0.3)
+for rotation in [0, 90, 180, 270]:
+    rotated = otvine.RotatedCopula(copula, rotation)
+    sample = rotated.getSample(N)
+    distribution = factory.build(sample)
+    print(distribution)
+    assert "TawnCopula" in str(distribution)
+    if rotation > 0:
+        assert f"rotation={rotation}" in str(distribution)

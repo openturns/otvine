@@ -38,6 +38,7 @@ endmacro ()
 
 
 ot_pyinstallcheck_test (RotatedCopula_std IGNOREOUT)
+ot_pyinstallcheck_test (TawnCopula_std IGNOREOUT)
 ot_pyinstallcheck_test (VineCopulaFactory_std IGNOREOUT)
 ot_pyinstallcheck_test (docstring IGNOREOUT)
 

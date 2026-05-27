@@ -10,3 +10,4 @@ API Reference
     VineCopulaFactory
     VineCopula
     RotatedCopula
+    TawnCopula
