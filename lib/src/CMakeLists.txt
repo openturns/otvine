@@ -3,10 +3,12 @@
 ot_add_current_dir_to_include_dirs ()
 
 ot_add_source_file (RotatedCopula.cxx)
+ot_add_source_file (TawnCopula.cxx)
 ot_add_source_file (VineCopulaFactory.cxx)
 ot_add_source_file (VineCopula.cxx)
 
 ot_install_header_file (RotatedCopula.hxx)
+ot_install_header_file (TawnCopula.hxx)
 ot_install_header_file (VineCopulaFactory.hxx)
 ot_install_header_file (VineCopula.hxx)
 

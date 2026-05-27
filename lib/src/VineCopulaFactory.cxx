@@ -19,6 +19,9 @@
  *
  */
 #include "otvine/VineCopulaFactory.hxx"
+#include "otvine/TawnCopula.hxx"
+#include "otvine/RotatedCopula.hxx"
+
 #include <openturns/PersistentObjectFactory.hxx>
 #include <openturns/ClaytonCopula.hxx>
 #include <openturns/GumbelCopula.hxx>
@@ -26,8 +29,6 @@
 #include <openturns/JoeCopula.hxx>
 #include <openturns/NormalCopula.hxx>
 #include <openturns/StudentCopula.hxx>
-
-#include "otvine/RotatedCopula.hxx"
 
 #include <vinecopulib.hpp>
 
@@ -73,6 +74,7 @@ Distribution VineCopulaFactory::build(const Sample & sample) const
       vinecopulib::BicopFamily::gumbel,
       vinecopulib::BicopFamily::frank,
       vinecopulib::BicopFamily::student,
+      vinecopulib::BicopFamily::tawn,
     };
   }
   vinecopulib::FitControlsVinecop controls(family_set);
@@ -111,6 +113,13 @@ Distribution VineCopulaFactory::build(const Sample & sample) const
         copula = GumbelCopula(theta);
       // else if (bicop.get_family_name() == "Joe")
       //   copula = JoeCopula(theta);
+      else if (bicop.get_family_name() == "Tawn")
+      {
+        const Scalar psi1 = bicop.get_parameters()(0, 0);
+        const Scalar psi2 = bicop.get_parameters()(1, 0);
+        const Scalar thetaTawn = bicop.get_parameters()(2, 0);
+        copula = TawnCopula(thetaTawn, psi1, psi2);
+      }
       if (copula.getDimension() == 2)
       {
         int rotation = bicop.get_rotation();
