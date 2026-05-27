@@ -21,4 +21,5 @@
 %include RotatedCopula.i
 %include TawnCopula.i
 %include VinecopCopula.i
+%include VineCopula.i
 %include VineCopulaFactory.i
