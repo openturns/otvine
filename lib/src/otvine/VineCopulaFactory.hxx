@@ -24,7 +24,6 @@
 #include <openturns/DistributionFactoryImplementation.hxx>
 
 #include "otvine/otvineprivate.hxx"
-#include "VineCopula.hxx"
 
 namespace OTVINE
 {

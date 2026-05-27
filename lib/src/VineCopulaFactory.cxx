@@ -21,6 +21,7 @@
 #include "otvine/VineCopulaFactory.hxx"
 #include "otvine/TawnCopula.hxx"
 #include "otvine/RotatedCopula.hxx"
+#include "otvine/VinecopCopula.hxx"
 
 #include <openturns/PersistentObjectFactory.hxx>
 #include <openturns/ClaytonCopula.hxx>
@@ -137,7 +138,7 @@ Distribution VineCopulaFactory::build(const Sample & sample) const
       }
     }
   }
-  return VineCopula(p_vinecop);
+  return VinecopCopula(p_vinecop);
 }
 
 

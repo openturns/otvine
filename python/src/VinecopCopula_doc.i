@@ -1,4 +1,4 @@
-%feature("docstring") OTVINE::VineCopula
+%feature("docstring") OTVINE::VinecopCopula
 "Vine copula.
 
 Examples
