@@ -43,10 +43,14 @@ class OTVINE_API VinecopCopula
   CLASSNAME
 
 public:
+  typedef OT::Collection<OT::Distribution> DistributionCollection;
+
   /** Default constructor */
   VinecopCopula();
 
   explicit VinecopCopula(const OT::Pointer<vinecopulib::Vinecop> & vinecop);
+  VinecopCopula(const OT::Matrix & matrix,
+                const DistributionCollection & copulaCollection);
 
   /** Virtual constructor method */
   VinecopCopula * clone() const override;

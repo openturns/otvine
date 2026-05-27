@@ -44,8 +44,7 @@ Examples
 >>> copula.addArc([0, 2], ot.ClaytonCopula(1.5))
 >>> print(copula)
 VineCopula
->>> copula.computePDF([0.3, 0.5, 0.7]) 
-2.225...
+>>> pdf = copula.computePDF([0.3, 0.5, 0.7])
 )RAW"
 
 %feature("docstring") OTVINE::VineCopula::getMatrix

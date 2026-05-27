@@ -35,6 +35,8 @@ namespace OTVINE
  * VineCopula is a vine copula built from a R-Vine matrix using a simplified syntax.
  * Use addArc() to add pair-copulas tree by tree.
  */
+typedef OT::Collection<OT::Distribution> DistributionCollection;
+
 class OTVINE_API VineCopula
   : public OT::DistributionImplementation
 {
@@ -91,10 +93,11 @@ public:
   OT::Matrix getMatrix() const;
 
   /** Accessor to the pair-copula collection */
-  OT::PersistentCollection<OT::Distribution> getCopulaCollection() const;
+  DistributionCollection getCopulaCollection() const;
 
 private:
   void buildMatrix();
+  OT::Point computeRealization(const OT::Point & w) const;
 
   OT::Matrix matrix_;
   OT::PersistentCollection<OT::Distribution> copulaCollection_;
