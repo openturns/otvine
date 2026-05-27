@@ -20,5 +20,5 @@
 %include otvine/otvineprivate.hxx
 %include RotatedCopula.i
 %include TawnCopula.i
-%include VineCopula.i
+%include VinecopCopula.i
 %include VineCopulaFactory.i

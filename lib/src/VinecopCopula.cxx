@@ -1,6 +1,6 @@
 //                                               -*- C++ -*-
 /**
- *  @brief VineCopula
+ *  @brief VinecopCopula
  *
  *  Copyright 2005-2026 Airbus-EDF-IMACS-ONERA-Phimeca
  *
@@ -18,7 +18,7 @@
  *  along with this library.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "otvine/VineCopula.hxx"
+#include "otvine/VinecopCopula.hxx"
 #include <openturns/PersistentObjectFactory.hxx>
 
 #include <vinecopulib.hpp>
@@ -28,36 +28,36 @@ using namespace OT;
 namespace OTVINE
 {
 
-CLASSNAMEINIT(VineCopula);
+CLASSNAMEINIT(VinecopCopula);
 
-static Factory<VineCopula> Factory_VineCopula;
+static Factory<VinecopCopula> Factory_VinecopCopula;
 
 
 /* Default constructor */
-VineCopula::VineCopula()
+VinecopCopula::VinecopCopula()
   : DistributionImplementation()
 {
   isCopula_ = true;
-  setName("VineCopula");
+  setName("VinecopCopula");
 }
 
-VineCopula::VineCopula(const Pointer<vinecopulib::Vinecop> & p_vinecop)
+VinecopCopula::VinecopCopula(const Pointer<vinecopulib::Vinecop> & p_vinecop)
   : DistributionImplementation()
   , p_vinecop_(p_vinecop)
 {
   isCopula_ = true;
-  setName("VineCopula");
+  setName("VinecopCopula");
   setDimension(p_vinecop->get_dim());
 }
 
 /* Virtual constructor method */
-VineCopula * VineCopula::clone() const
+VinecopCopula * VinecopCopula::clone() const
 {
-  return new VineCopula(*this);
+  return new VinecopCopula(*this);
 }
 
 /* Get the PDF of the distribution */
-Scalar VineCopula::computePDF(const Point & point) const
+Scalar VinecopCopula::computePDF(const Point & point) const
 {
   const UnsignedInteger dimension = getDimension();
   Eigen::MatrixXd u(1, dimension);
@@ -67,7 +67,7 @@ Scalar VineCopula::computePDF(const Point & point) const
 }
 
 /* Get the CDF of the distribution */
-Scalar VineCopula::computeCDF(const Point & point) const
+Scalar VinecopCopula::computeCDF(const Point & point) const
 {
   const UnsignedInteger dimension = getDimension();
   Eigen::MatrixXd u(1, dimension);
@@ -77,7 +77,7 @@ Scalar VineCopula::computeCDF(const Point & point) const
 }
 
 /* Get one realization of the distribution */
-Point VineCopula::getRealization() const
+Point VinecopCopula::getRealization() const
 {
   const UnsignedInteger dimension = getDimension();
   const Eigen::MatrixXd u(p_vinecop_->simulate(1));
@@ -87,7 +87,7 @@ Point VineCopula::getRealization() const
   return result;
 }
 
-Sample VineCopula::getSample(const UnsignedInteger size) const
+Sample VinecopCopula::getSample(const UnsignedInteger size) const
 {
   const UnsignedInteger dimension = getDimension();
   const Eigen::MatrixXd u(p_vinecop_->simulate(size));
@@ -99,52 +99,52 @@ Sample VineCopula::getSample(const UnsignedInteger size) const
 }
 
 /* Parameters value accessor */
-Point VineCopula::getParameter() const
+Point VinecopCopula::getParameter() const
 {
   return {};
 }
 
-void VineCopula::setParameter(const Point & parameter)
+void VinecopCopula::setParameter(const Point & parameter)
 {
   if (parameter.getSize() != 0)
     throw InvalidArgumentException(HERE) << "Error: expected 0 value, got " << parameter.getSize();
 }
 
 /* Parameters description accessor */
-Description VineCopula::getParameterDescription() const
+Description VinecopCopula::getParameterDescription() const
 {
   return {};
 }
 
 /* Comparison operator */
-Bool VineCopula::operator ==(const VineCopula & other) const
+Bool VinecopCopula::operator ==(const VinecopCopula & other) const
 {
   if (this == &other) return true;
   return false;
 }
 
-Bool VineCopula::equals(const DistributionImplementation & other) const
+Bool VinecopCopula::equals(const DistributionImplementation & other) const
 {
-  const VineCopula* p_other = dynamic_cast<const VineCopula*>(&other);
+  const VinecopCopula* p_other = dynamic_cast<const VinecopCopula*>(&other);
   return p_other && (*this == *p_other);
 }
 
 /* String converter */
-String VineCopula::__repr__() const
+String VinecopCopula::__repr__() const
 {
   OSS oss;
-  oss << "class=" << VineCopula::GetClassName() << " " << p_vinecop_->str();
+  oss << "class=" << VinecopCopula::GetClassName() << " " << p_vinecop_->str();
   return oss;
 }
 
 /* Method save() stores the object through the StorageManager */
-void VineCopula::save(Advocate & adv) const
+void VinecopCopula::save(Advocate & adv) const
 {
   DistributionImplementation::save(adv);
 }
 
 /* Method load() reloads the object from the StorageManager */
-void VineCopula::load(Advocate & adv)
+void VinecopCopula::load(Advocate & adv)
 {
   DistributionImplementation::load(adv);
 }

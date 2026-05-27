@@ -1,6 +1,6 @@
 //                                               -*- C++ -*-
 /**
- *  @brief VineCopula
+ *  @brief VinecopCopula
  *
  *  Copyright 2005-2026 Airbus-EDF-IMACS-ONERA-Phimeca
  *
@@ -18,8 +18,8 @@
  *  along with this library.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#ifndef OTVINE_VINECOPULA_HXX
-#define OTVINE_VINECOPULA_HXX
+#ifndef OTVINE_VINECOPCOPULA_HXX
+#define OTVINE_VINECOPCOPULA_HXX
 
 #include <openturns/DistributionImplementation.hxx>
 
@@ -33,25 +33,25 @@ namespace OTVINE
 {
 
 /**
- * @class VineCopula
+ * @class VinecopCopula
  *
- * VineCopula is some vinecopulafactory type to illustrate how to add some classes in OpenTURNS
+ * VinecopCopula is some vinecopulafactory type to illustrate how to add some classes in OpenTURNS
  */
-class OTVINE_API VineCopula
+class OTVINE_API VinecopCopula
   : public OT::DistributionImplementation
 {
   CLASSNAME
 
 public:
   /** Default constructor */
-  VineCopula();
+  VinecopCopula();
 
-  explicit VineCopula(const OT::Pointer<vinecopulib::Vinecop> & vinecop);
+  explicit VinecopCopula(const OT::Pointer<vinecopulib::Vinecop> & vinecop);
 
   /** Virtual constructor method */
-  VineCopula * clone() const override;
+  VinecopCopula * clone() const override;
 
-  OT::Bool operator ==(const VineCopula & other) const;
+  OT::Bool operator ==(const VinecopCopula & other) const;
 protected:
   OT::Bool equals(const DistributionImplementation & other) const override;
 public:
@@ -87,8 +87,8 @@ public:
 private:
   OT::Pointer<vinecopulib::Vinecop> p_vinecop_;
 
-}; /* class VineCopula */
+}; /* class VinecopCopula */
 
 } /* namespace OTVINE */
 
-#endif /* OTVINE_VINECOPULA_HXX */
+#endif /* OTVINE_VINECOPCOPULA_HXX */
