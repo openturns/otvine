@@ -87,6 +87,13 @@ Distribution VineCopulaFactory::build(const Sample & sample) const
     if (p_vinecop->get_dim() == 2 && pairs.size() == 1 && pairs[0].size() == 1)
     {
       vinecopulib::Bicop bicop = pairs[0][0];
+      // Vinecop edges are stored with first argument aligned to conditioned
+      // variable `a`; in 2D select() orients the edge as (2, 1) while
+      // RotatedCopula assumes order (1, 2). Flip back so 90/270 rotations
+      // and asymmetric parameters (e.g. Tawn psi1/psi2) match.
+      const std::vector<std::vector<vinecopulib::RVineTrees::Edge> > trees = p_vinecop->get_trees().get_trees();
+      if (!trees.empty() && !trees[0].empty() && (trees[0][0].a != 1 || trees[0][0].b != 2))
+        bicop.flip();
       Distribution copula;
       const Scalar theta = bicop.get_parameters()(0, 0);
       LOGDEBUG(OSS() << "family="<< bicop.get_family_name() << " theta=" << theta << " rotation=" << bicop.get_rotation());

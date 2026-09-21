@@ -17,7 +17,7 @@ list (APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 find_package (OpenTURNS CONFIG REQUIRED)
 message (STATUS "Found OpenTURNS: ${OPENTURNS_ROOT_DIR} (found version \"${OPENTURNS_VERSION_STRING}\")")
 
-find_package (vinecopulib 0.7.1 CONFIG REQUIRED)
+find_package (vinecopulib 1 CONFIG REQUIRED)
 message (STATUS "Found vinecopulib: ${vinecopulib_DIR} (found version \"${vinecopulib_VERSION}\")")
 
 if (NOT BUILD_SHARED_LIBS)

@@ -94,7 +94,7 @@ Point RotatedCopula::rotate(const Point & x, const Bool inverse) const
     case (90):
       return {u2, 1.0 - u1};
     case (180):
-      return {1.0 - u2, 1.0 - u1};
+      return {1.0 - u1, 1.0 - u2};
     case (270):
       return {1.0 - u2, u1};
     default:
@@ -119,7 +119,7 @@ Point RotatedCopula::computeDDF(const Point & point) const
     case (90):
       return {-ddf0[1], ddf0[0]};
     case (180):
-      return {-ddf0[1], -ddf0[0]};
+      return {-ddf0[0], -ddf0[1]};
     case (270):
       return {ddf0[1], -ddf0[0]};
     default:
