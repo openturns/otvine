@@ -106,29 +106,19 @@ TawnCopula * TawnCopula::clone() const
 /* Parameters value accessor */
 Point TawnCopula::getParameter() const
 {
-  Point result;
-  result.add(theta_);
-  result.add(psi1_);
-  result.add(psi2_);
-  return result;
+  return {theta_, psi1_, psi2_};
 }
 
 void TawnCopula::setParameter(const Point & parameter)
 {
   if (parameter.getSize() != 3) throw InvalidArgumentException(HERE) << "Error: expected 3 values, got " << parameter.getSize();
-  const Scalar w = getWeight();
   *this = TawnCopula(parameter[0], parameter[1], parameter[2]);
-  setWeight(w);
 }
 
 /* Parameters description accessor */
 Description TawnCopula::getParameterDescription() const
 {
-  Description result;
-  result.add("theta");
-  result.add("psi1");
-  result.add("psi2");
-  return result;
+  return {"theta", "psi1", "psi2"};
 }
 
 /* theta parameter accessor */
