@@ -41,6 +41,7 @@ VinecopCopula::VinecopCopula()
 {
   isCopula_ = true;
   setName("VinecopCopula");
+  computeRange();
 }
 
 VinecopCopula::VinecopCopula(const Pointer<vinecopulib::Vinecop> & p_vinecop)
@@ -50,6 +51,7 @@ VinecopCopula::VinecopCopula(const Pointer<vinecopulib::Vinecop> & p_vinecop)
   isCopula_ = true;
   setName("VinecopCopula");
   setDimension(p_vinecop->get_dim());
+  computeRange();
 }
 
 namespace
@@ -124,6 +126,7 @@ VinecopCopula::VinecopCopula(const Matrix & matrix,
 
   const UnsignedInteger d = matrix.getNbRows();
   setDimension(d);
+  computeRange();
 
   // Convert OT matrix to Eigen matrix (size_t, d x d)
   Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(d, d);
@@ -159,6 +162,10 @@ VinecopCopula * VinecopCopula::clone() const
 Scalar VinecopCopula::computePDF(const Point & point) const
 {
   const UnsignedInteger dimension = getDimension();
+  if (point.getDimension() != dimension)
+    throw InvalidArgumentException(HERE) << "Error: the given point must have dimension=" << dimension << ", here dimension=" << point.getDimension();
+  for (UnsignedInteger j = 0; j < dimension; ++ j)
+    if (!(point[j] >= 0.0) || !(point[j] <= 1.0)) return 0.0;
   Eigen::MatrixXd u(1, dimension);
     for (UnsignedInteger j = 0; j < dimension; ++ j)
       u(0, j) = point[j];
@@ -169,9 +176,13 @@ Scalar VinecopCopula::computePDF(const Point & point) const
 Scalar VinecopCopula::computeCDF(const Point & point) const
 {
   const UnsignedInteger dimension = getDimension();
+  if (point.getDimension() != dimension)
+    throw InvalidArgumentException(HERE) << "Error: the given point must have dimension=" << dimension << ", here dimension=" << point.getDimension();
+  for (UnsignedInteger j = 0; j < dimension; ++ j)
+    if (point[j] < 0.0) return 0.0;
   Eigen::MatrixXd u(1, dimension);
   for (UnsignedInteger j = 0; j < dimension; ++ j)
-    u(0, j) = point[j];
+    u(0, j) = std::min(point[j], 1.0);
   return p_vinecop_->cdf(u)[0];
 }
 

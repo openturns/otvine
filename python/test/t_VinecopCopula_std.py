@@ -55,8 +55,6 @@ print(f"4D Native PDF={pdf4_0}, Vinecop PDF={pdf4}")
 assert pdf4 > 0.0
 ott.assert_almost_equal(pdf4_0, pdf4, 1e-7, 0.0)
 
-
-
 sample4 = vc4.getSample(50)
 assert sample4.getSize() == 50
 assert sample4.getDimension() == 4
@@ -75,5 +73,12 @@ for j in range(3):
     print(f"  Marginal {j}: p-value={pval:.4f}")
     assert pval > alpha, f"Marginal {j} KS test failed (p={pval})"
 
-print()
+ot.Log.Show(ot.Log.TRACE)
+validation = ott.DistributionValidation(vc)
+# Covariance/Spearman/Kendall require multi-dimensional quadrature over the
+# CDF; skip them (moments already cover mean/stddev/skewness/kurtosis)
+validation.skipCorrelation()
+validation.skipDependenceMeasures()
+validation.run()
+
 print("All tests passed!")
