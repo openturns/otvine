@@ -37,14 +37,13 @@ CLASSNAMEINIT(VineCopula);
 
 static Factory<VineCopula> Factory_VineCopula;
 
-static const Scalar EPS = std::sqrt(SpecFunc::ScalarEpsilon);
-
 
 VineCopula::VineCopula()
   : DistributionImplementation()
 {
   isCopula_ = true;
   setName("VineCopula");
+  computeRange();
 }
 
 VineCopula::VineCopula(const UnsignedInteger dimension)
@@ -53,6 +52,7 @@ VineCopula::VineCopula(const UnsignedInteger dimension)
   isCopula_ = true;
   setName("VineCopula");
   setDimension(dimension);
+  computeRange();
 }
 
 VineCopula::VineCopula(const Matrix & matrix,
@@ -62,6 +62,7 @@ VineCopula::VineCopula(const Matrix & matrix,
   isCopula_ = true;
   setName("VineCopula");
   setDimension(matrix.getNbRows());
+  computeRange();
   matrix_ = matrix;
   copulaCollection_ = copulaCollection;
 }
@@ -106,37 +107,22 @@ UnsignedInteger arcIndex(UnsignedInteger tree, UnsignedInteger edge, UnsignedInt
   return tree * d - tree * (tree + 1) / 2 + edge;
 }
 
-// Compute F(u_j | u_{j-1}, ..., u_{i+1}) for the "right side" pseudo-observation
-// Uses hfunc2 (P(Var_2 ≤ v | Var_1 = u)) computed via finite differences of CDF
+// Compute F(v | u) for the "right side" pseudo-observation
+// Uses the analytical conditional CDF P(Var_2 <= v | Var_1 = u)
 Scalar hfunc2(const Distribution & copula, Scalar v, Scalar u)
 {
-  const Scalar uLo = std::max(0.0, u - EPS);
-  const Scalar uHi = std::min(1.0, u + EPS);
-  const Scalar cLo = copula.computeCDF(Point({uLo, v}));
-  const Scalar cHi = copula.computeCDF(Point({uHi, v}));
-  return (cHi - cLo) / (uHi - uLo);
+  if (v <= 0.0) return 0.0;
+  if (v >= 1.0) return 1.0;
+  return copula.computeConditionalCDF(v, Point(1, u));
 }
 
 // Inverse of hfunc2: find v such that hfunc2(copula, v, u) = q
-// Uses bisection
+// Uses the analytical conditional quantile
 Scalar hfunc2_inv(const Distribution & copula, Scalar q, Scalar u)
 {
   if (q <= 0.0) return 0.0;
   if (q >= 1.0) return 1.0;
-  Scalar lo = 0.0;
-  Scalar hi = 1.0;
-  for (UnsignedInteger iter = 0; iter < 50; ++iter)
-  {
-    const Scalar mid = 0.5 * (lo + hi);
-    const Scalar fmid = hfunc2(copula, mid, u) - q;
-    if (fmid > 0.0)
-      hi = mid;
-    else
-      lo = mid;
-    if (hi - lo < 1e-14)
-      break;
-  }
-  return 0.5 * (lo + hi);
+  return copula.computeConditionalQuantile(q, Point(1, u));
 }
 
 // Build the R-vine matrix for a D-vine with given order (0-based).

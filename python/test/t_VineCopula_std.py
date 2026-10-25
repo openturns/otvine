@@ -82,5 +82,11 @@ assert mat2.getNbRows() == 3
 copulas2 = copula_r.getCopulaCollection()
 assert len(copulas2) == 3
 
-print()
+ot.Log.Show(ot.Log.TRACE)
+validation = ott.DistributionValidation(copula)
+# Covariance/Spearman/Kendall require multi-dimensional quadrature over the
+# (slow) CDF; skip them (moments already cover mean/stddev/skewness/kurtosis)
+validation.skipCorrelation()
+validation.skipDependenceMeasures()
+validation.run()
 print("All tests passed!")
